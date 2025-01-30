@@ -19,6 +19,7 @@ public class KindClusterTest {
         // Create a fabric8 client and use it!
         try (final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()))) {
             assertEquals(1, client.nodes().list().getItems().size());
+            assertEquals(client.nodes().list().getItems().get(0).getMetadata().getName(),"kind");
         }
     }
 }
