@@ -5,10 +5,11 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -26,12 +27,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 @Testcontainers
 public class ArgoCDDeployTest {
+    private static final Logger LOG = LoggerFactory.getLogger(ArgoCDDeployTest.class);
+
     @Container
     public static final KindContainer<?> KUBE = new KindContainer<>();
 
     private static final String ARGOCD_NS = "argocd";
+
     private static final String ARGOCD_DEPLOYMENT_SERVER_NAME = "argocd-server";
+    private static final String ARGOCD_DEPLOYMENT_REDIS_NAME = "argocd-redis";
+    private static final String ARGOCD_DEPLOYMENT_REPO_SERVER_NAME = "argocd-repo-server";
+    private static final String ARGOCD_DEPLOYMENT_DEX_SERVER_NAME = "argocd-dex-server";
+    private static final String ARGOCD_DEPLOYMENT_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
+    private static final String ARGOCD_DEPLOYMENT_APPLICATIONSET_CONTROLLER_NAME = "argocd-applicationset-controller";
     private static final String ARGOCD_POD_APP_CONTROLLER_NAME = "argocd-application-controller-0";
+
     private static final String DEPLOYMENT_STATUS_AVAILABLE = "Available";
     private static final String POD_STATUS_AVAILABLE = "Ready";
 
@@ -47,6 +57,7 @@ public class ArgoCDDeployTest {
                 .get();
             assertThat(resource, is(notNullValue()));
             assertThat(resource.getStatus().getConditions().stream().anyMatch(c -> c.getType().equals(DEPLOYMENT_STATUS_AVAILABLE)), is(true));
+            LOG.info("Deployment available: {}", name);
         });
     }
 
@@ -58,6 +69,7 @@ public class ArgoCDDeployTest {
                 .get();
             assertThat(resource, is(notNullValue()));
             assertThat(resource.getStatus().getConditions().stream().anyMatch(c -> c.getType().equals(POD_STATUS_AVAILABLE)), is(true));
+            LOG.info("Pod ready: {}", name);
         });
     }
 
@@ -94,6 +106,12 @@ public class ArgoCDDeployTest {
         });
 
         checkDeploymentReady(ARGOCD_DEPLOYMENT_SERVER_NAME);
+        checkDeploymentReady(ARGOCD_DEPLOYMENT_REDIS_NAME);
+        checkDeploymentReady(ARGOCD_DEPLOYMENT_REPO_SERVER_NAME);
+        checkDeploymentReady(ARGOCD_DEPLOYMENT_DEX_SERVER_NAME);
+        checkDeploymentReady(ARGOCD_DEPLOYMENT_NOTIFICATION_CONTROLLER_NAME);
+        checkDeploymentReady(ARGOCD_DEPLOYMENT_APPLICATIONSET_CONTROLLER_NAME);
+
         checkPodReady(ARGOCD_POD_APP_CONTROLLER_NAME);
     }
 }
