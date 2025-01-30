@@ -10,7 +10,7 @@ import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
-public class KindClusterTest {
+public class KindClusterNodeTest {
     @Container
     public static final KindContainer<?> KUBE = new KindContainer<>();
 
