@@ -111,7 +111,7 @@ public class ArgoCDDeployTest {
         checkDeploymentReady(ARGOCD_DEPLOYMENT_DEX_SERVER_NAME);
         checkDeploymentReady(ARGOCD_DEPLOYMENT_NOTIFICATION_CONTROLLER_NAME);
         checkDeploymentReady(ARGOCD_DEPLOYMENT_APPLICATIONSET_CONTROLLER_NAME);
-
+        // Checking the pod created by the StatefulSet
         checkPodReady(ARGOCD_POD_APP_CONTROLLER_NAME);
     }
 }
