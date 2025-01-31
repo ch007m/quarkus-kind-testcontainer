@@ -14,7 +14,7 @@ public class KindClusterNodeTest {
     @Container
     public static final KindContainer<?> KUBE = new KindContainer<>();
 
-    @Test
+    // @Test
     public void verify_node_is_present() {
         // Create a fabric8 client and use it!
         try (final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()))) {

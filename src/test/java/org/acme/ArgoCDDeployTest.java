@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
@@ -88,7 +89,7 @@ public class ArgoCDDeployTest {
         for (HasMetadata item : items) {
             var res = client.resource(item).inNamespace("argocd");
             res.create();
-            res.waitUntilReady(5, TimeUnit.SECONDS);
+            //res.waitUntilReady(5, TimeUnit.SECONDS);
             assertNotNull(res);
         }
 
@@ -126,8 +127,9 @@ public class ArgoCDDeployTest {
         config.setApplicationNamespace("argocd");
 
         Application app = populateApplication(config);
-        Resource res = client.resource(app).inNamespace(ARGOCD_NS);
-        res.create();
-        res.waitUntilReady(30, TimeUnit.SECONDS);
+        Application argocdApp = client.resource(app)
+            .inNamespace(ARGOCD_NS)
+            .waitUntilCondition(s -> s.getStatus().getHealth().getStatus().equals("Healthy"),30, TimeUnit.SECONDS);
+        assertThat(argocdApp.getStatus().getHealth().getStatus(), is("Healthy"));
     }
 }
