@@ -7,6 +7,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.Resource;
+import io.quarkiverse.argocd.v1alpha1.Application;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
+import static org.acme.ArgocdResourceGenerator.populateApplication;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -83,8 +86,10 @@ public class ArgoCDDeployTest {
 
         // Deploy the different resources: Service, CRD, Deployment, ConfigMap
         for (HasMetadata item : items) {
-            HasMetadata response = client.resource(item).inNamespace("argocd").create();
-            assertNotNull(response);
+            var res = client.resource(item).inNamespace("argocd");
+            res.create();
+            res.waitUntilReady(5, TimeUnit.SECONDS);
+            assertNotNull(res);
         }
 
         // Wait till pod is running, etc
@@ -113,5 +118,16 @@ public class ArgoCDDeployTest {
         checkDeploymentReady(ARGOCD_DEPLOYMENT_APPLICATIONSET_CONTROLLER_NAME);
         // Checking the pod created by the StatefulSet
         checkPodReady(ARGOCD_POD_APP_CONTROLLER_NAME);
+
+        // Populate the Argocd resources
+        Config config = new Config();
+        config.setDestinationNamespace("argocd");
+        config.setApplicationName("test-1");
+        config.setApplicationNamespace("argocd");
+
+        Application app = populateApplication(config);
+        Resource res = client.resource(app).inNamespace(ARGOCD_NS);
+        res.create();
+        res.waitUntilReady(30, TimeUnit.SECONDS);
     }
 }

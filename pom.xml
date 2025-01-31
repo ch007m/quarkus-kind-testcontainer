@@ -39,8 +39,18 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.36</version>
+        </dependency>
 
         <!-- Test -->
+        <dependency>
+            <groupId>io.quarkiverse.argocd</groupId>
+            <artifactId>quarkus-argocd-deployment</artifactId>
+            <version>0.1.0</version>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
