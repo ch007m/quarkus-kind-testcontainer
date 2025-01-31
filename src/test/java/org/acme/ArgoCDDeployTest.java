@@ -66,16 +66,20 @@ public class ArgoCDDeployTest {
         });
     }
 
-    private void checkPodReady(String name) {
-        await().atMost(2, TimeUnit.MINUTES).untilAsserted(() -> {
-            var resource = client.resources(Pod.class)
-                .inNamespace(ARGOCD_NS)
-                .withName(name)
-                .get();
-            assertThat(resource, is(notNullValue()));
-            assertThat(resource.getStatus().getConditions().stream().anyMatch(c -> c.getType().equals(POD_STATUS_AVAILABLE)), is(true));
-            LOG.info("Pod ready: {}", name);
-        });
+    private void waitTillPodReady(String ns, String name) {
+        client.resources(Pod.class)
+            .inNamespace(ns)
+            .withName(name)
+            .waitUntilReady(30, TimeUnit.SECONDS);
+        LOG.info("Pod: {} ready in {}", name, ns);
+    }
+
+    private void waitTillPodByLabelReady(String ns, String key, String value) {
+        client.resources(Pod.class)
+            .inNamespace(ns)
+            .withLabel(key, value)
+            .waitUntilReady(30, TimeUnit.SECONDS);
+        LOG.info("Pod: {} ready in {}", value, ns);
     }
 
     @Test
@@ -112,20 +116,24 @@ public class ArgoCDDeployTest {
             assertThat(firstContainer.getImage(), is("quay.io/argoproj/argocd:v2.13.2"));
         });
 
+
         checkDeploymentReady(ARGOCD_DEPLOYMENT_SERVER_NAME);
         checkDeploymentReady(ARGOCD_DEPLOYMENT_REDIS_NAME);
         checkDeploymentReady(ARGOCD_DEPLOYMENT_REPO_SERVER_NAME);
         checkDeploymentReady(ARGOCD_DEPLOYMENT_DEX_SERVER_NAME);
         checkDeploymentReady(ARGOCD_DEPLOYMENT_NOTIFICATION_CONTROLLER_NAME);
         checkDeploymentReady(ARGOCD_DEPLOYMENT_APPLICATIONSET_CONTROLLER_NAME);
-        // Checking the pod created by the StatefulSet
-        checkPodReady(ARGOCD_POD_APP_CONTROLLER_NAME);
+
+        // Waiting till the pods are ready/running ...
+        waitTillPodReady(ARGOCD_NS, ARGOCD_POD_APP_CONTROLLER_NAME);
+        waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name","argocd-server");
 
         // Populate the Argocd resources
         Config config = new Config();
         config.setDestinationNamespace("argocd");
         config.setApplicationName("test-1");
         config.setApplicationNamespace("argocd");
+        config.setGitRevision("master");
 
         client.resource(populateApplication(config))
             .inNamespace(ARGOCD_NS)
@@ -138,7 +146,26 @@ public class ArgoCDDeployTest {
                 a != null &&
                 a.getStatus() != null &&
                 a.getStatus().getHealth() != null &&
-                a.getStatus().getHealth().getStatus().equals("Healthy"),60, TimeUnit.SECONDS);
+                a.getStatus().getHealth().getStatus().equals("Healthy") &&
+                a.getStatus().getSync().getStatus().equals("Synced"),1800, TimeUnit.SECONDS);
+
+        // TODO: Investigate why the pod is never created as status of Sync never become => synced
+        // or if error is reported by argocd server/controller
+        // journalctl -xeu kubelet
+        // alias k=kubectl
+
+        // Argocd Server
+        // time="2025-01-31T13:16:27Z" level=warning msg="Failed to resync revoked tokens. retrying again in 1 minute: dial tcp 10.245.14.250:6379: connect: connection refused"
+
+        // Application Controller
+        // time="2025-01-31T13:16:23Z" level=info msg="Normalized app spec: {\"status\":{\"conditions\":[{\"lastTransitionTime\":\"2025-01-31T13:16:23Z\",\"message\":\"Failed to load target state: failed to generate manifest for source 1 of 1: rpc error: code = Unavailable desc = connection error: desc = \\\"transport: Error while dialing: dial tcp 10.245.254.103:8081: connect: connection refused\\\"\",\"type\":\"ComparisonError\"}]}}" app-namespace=argocd app-qualified-name=argocd/test-1 application=test-1 project=default
+        // time="2025-01-31T13:16:26Z" level=error msg="Failed to cache app resources: error setting app resource tree: dial tcp 10.245.14.250:6379: connect: connection refused" app-namespace=argocd app-qualified-name=argocd/test-1 application=test-1 comparison-level=3 dedup_ms=0 dest-name= dest-namespace=argocd dest-server="https://kubernetes.default.svc" diff_ms=0 git_ms=360 health_ms=0 live_ms=0 project=default settings_ms=0 sync_ms=0
+        // time="2025-01-31T13:16:26Z" level=info msg="Skipping auto-sync: application status is Unknown" app-namespace=argocd app-qualified-name=argocd/test-1 application=test-1 project=default
+        // time="2025-01-31T13:16:26Z" level=info msg="Updated sync status:  -> Unknown" application=test-1 dest-namespace=argocd dest-server="https://kubernetes.default.svc" reason=ResourceUpdated type=Normal
+        // time="2025-01-31T13:16:26Z" level=info msg="Updated health status:  -> Healthy" application=test-1 dest-namespace=argocd dest-server="https://kubernetes.default.svc" reason=ResourceUpdated type=Normal
+        // time="2025-01-31T13:16:26Z" level=info msg="Update successful" app-namespace=argocd app-qualified-name=argocd/test-1 application=test-1 project=default
+        // time="2025-01-31T13:16:26Z" level=info msg="Reconciliation completed" app-namespace=argocd app-qualified-name=argocd/test-1 app_status_update_ms=0 application=test-1 auto_sync_ms=0 compare_app_state_ms=360 comparison-level=3 comparison_with_nothing_ms=0 dedup_ms=0 dest-name= dest-namespace=argocd dest-server="https://kubernetes.default.svc" diff_ms=0 git_ms=360 health_ms=0 live_ms=0 normalize_application_ms=2 patch_ms=3 persist_app_status_ms=7 process_finalizers_ms=0 project=default refresh_app_conditions_ms=0 set_app_managed_resources_ms=3156 setop_ms=0 settings_ms=0 sync_ms=0 time_ms=3527
+
 
         Application app = client.resources(Application.class)
             .inNamespace(ARGOCD_NS)
