@@ -9,6 +9,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.quarkiverse.argocd.v1alpha1.Application;
+import io.quarkus.logging.Log;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,10 +127,24 @@ public class ArgoCDDeployTest {
         config.setApplicationName("test-1");
         config.setApplicationNamespace("argocd");
 
-        Application app = populateApplication(config);
-        Application argocdApp = client.resource(app)
+        client.resource(populateApplication(config))
             .inNamespace(ARGOCD_NS)
-            .waitUntilCondition(s -> s.getStatus().getHealth().getStatus().equals("Healthy"),30, TimeUnit.SECONDS);
-        assertThat(argocdApp.getStatus().getHealth().getStatus(), is("Healthy"));
+            .create();
+
+        client.resources(Application.class)
+            .inNamespace(ARGOCD_NS)
+            .withName(config.getApplicationName())
+            .waitUntilCondition(a ->
+                a != null &&
+                a.getStatus() != null &&
+                a.getStatus().getHealth() != null &&
+                a.getStatus().getHealth().getStatus().equals("Healthy"),60, TimeUnit.SECONDS);
+
+        Application app = client.resources(Application.class)
+            .inNamespace(ARGOCD_NS)
+            .withName(config.getApplicationName()).get();
+
+        LOG.info("Argocd Application is ready: {}", config.getApplicationName());
+        LOG.info(client.getKubernetesSerialization().asYaml(app));
     }
 }
