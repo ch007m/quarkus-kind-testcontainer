@@ -154,14 +154,6 @@ public class ArgoCDDeployTest {
         }
         LOG.info("Argocd Application: {} healthy", config.getApplicationName());
 
-        /*
-         journalctl -xeu kubelet
-         alias k=kubectl
-         k get po -A
-         k get Applications -A
-         k get AppProject -A
-        */
-
         LOG.info("Checking now when Argocd Application will be synced");
         try {
         client.resources(Application.class)
