@@ -152,11 +152,12 @@ public class ArgoCDDeployTest {
         // as Jackson cannot process the Application object as it do not include the Operation class and related
         // Such Operation is added by Argo cd when it performs sync or health operations and
         // here: status is not yet healthy and synced is out-of-sync
+        /*
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }*/
 
         LOG.info("Checking when Argocd Application will be Healthy");
         try {
@@ -201,6 +202,6 @@ public class ArgoCDDeployTest {
         Application app = client.resources(Application.class)
             .inNamespace(ARGOCD_NS)
             .withName(config.getApplicationName()).get();
-        LOG.info(client.getKubernetesSerialization().asYaml(app));
+        LOG.warn(client.getKubernetesSerialization().asYaml(app));
     }
 }
