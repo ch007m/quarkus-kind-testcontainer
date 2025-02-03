@@ -55,20 +55,6 @@ public class ArgoCDDeployTest {
 
     final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()));
 
-    // String argocdUrl = "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml";
-
-    private void checkDeploymentReady(String name) {
-        await().atMost(2, TimeUnit.MINUTES).untilAsserted(() -> {
-            var resource = client.resources(Deployment.class)
-                .inNamespace(ARGOCD_NS)
-                .withName(name)
-                .get();
-            assertThat(resource, is(notNullValue()));
-            assertThat(resource.getStatus().getConditions().stream().anyMatch(c -> c.getType().equals(DEPLOYMENT_STATUS_AVAILABLE)), is(true));
-            LOG.info("Deployment available: {}", name);
-        });
-    }
-
     private void waitTillPodReady(String ns, String name) {
         client.resources(Pod.class)
             .inNamespace(ns)
@@ -119,13 +105,6 @@ public class ArgoCDDeployTest {
             assertThat(firstContainer.getImage(), is("quay.io/argoproj/argocd:v2.13.2"));
         });
 
-
-/*      checkDeploymentReady(ARGOCD_DEPLOYMENT_SERVER_NAME);
-        checkDeploymentReady(ARGOCD_DEPLOYMENT_REDIS_NAME);
-        checkDeploymentReady(ARGOCD_DEPLOYMENT_REPO_SERVER_NAME);
-        checkDeploymentReady(ARGOCD_DEPLOYMENT_DEX_SERVER_NAME);
-        checkDeploymentReady(ARGOCD_DEPLOYMENT_NOTIFICATION_CONTROLLER_NAME);
-        checkDeploymentReady(ARGOCD_DEPLOYMENT_APPLICATIONSET_CONTROLLER_NAME);*/
 
         // Waiting till the pods are ready/running ...
         waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_REDIS_NAME);
@@ -179,7 +158,7 @@ public class ArgoCDDeployTest {
          journalctl -xeu kubelet
          alias k=kubectl
          k get po -A
-         k get applications -A
+         k get Applications -A
          k get AppProject -A
         */
 
