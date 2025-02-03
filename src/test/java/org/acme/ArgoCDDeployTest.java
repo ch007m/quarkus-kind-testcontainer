@@ -147,23 +147,31 @@ public class ArgoCDDeployTest {
             .inNamespace(ARGOCD_NS)
             .create();
 
-        // Sleep 2 minutes
+        // Sleep 5 seconds
+        // If we don't pause here the program, then we got this error: https://github.com/ch007m/quarkus-kind-testcontainer/issues/1#issuecomment-2630766957
+        // as Jackson cannot process the Application object as it do not include the Operation class and related
+        // Such Operation is added by Argo cd when it performs sync or health operations and
+        // here: status is not yet healthy and synced is out-of-sync
         try {
-            Thread.sleep(120000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
         LOG.info("Checking when Argocd Application will be Healthy");
-        client.resources(Application.class)
-            .inNamespace(ARGOCD_NS)
-            .withName(config.getApplicationName())
-            .waitUntilCondition(a ->
-                a != null &&
-                a.getStatus() != null &&
-                a.getStatus().getHealth() != null &&
-                a.getStatus().getHealth().getStatus() != null &&
-                a.getStatus().getHealth().getStatus().equals("Healthy"),3600, TimeUnit.SECONDS);
+        try {
+            client.resources(Application.class)
+                .inNamespace(ARGOCD_NS)
+                .withName(config.getApplicationName())
+                .waitUntilCondition(a ->
+                    a != null &&
+                        a.getStatus() != null &&
+                        a.getStatus().getHealth() != null &&
+                        a.getStatus().getHealth().getStatus() != null &&
+                        a.getStatus().getHealth().getStatus().equals("Healthy"), 3600, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOG.error(client.getKubernetesSerialization().asYaml(client.genericKubernetesResources("argoproj.io/v1alpha1", "Application").inNamespace(ARGOCD_NS).withName(config.getApplicationName()).get()));
+        }
         LOG.info("Argocd Application: {} healthy", config.getApplicationName());
 
         /*
@@ -175,6 +183,7 @@ public class ArgoCDDeployTest {
         */
 
         LOG.info("Checking now when Argocd Application will be synced");
+        try {
         client.resources(Application.class)
             .inNamespace(ARGOCD_NS)
             .withName(config.getApplicationName())
@@ -184,6 +193,9 @@ public class ArgoCDDeployTest {
                 a.getStatus().getSync() != null &&
                 a.getStatus().getSync().getStatus() != null &&
                 a.getStatus().getSync().getStatus().equals("Synced"), 3600, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOG.error(client.getKubernetesSerialization().asYaml(client.genericKubernetesResources("argoproj.io/v1alpha1", "Application").inNamespace(ARGOCD_NS).withName(config.getApplicationName()).get()));
+        }
         LOG.info("Argocd Application: {} synced", config.getApplicationName());
 
         Application app = client.resources(Application.class)
