@@ -84,4 +84,5 @@ jobs:
       - name: Perform CI test
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
+          export DOCKER_HOST="unix:///var/run/docker.sock"
           mvn test -Dtest=ArgoCDDeployTest
