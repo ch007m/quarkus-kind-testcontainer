@@ -31,8 +31,9 @@ jobs:
         run: |
           podman -v
           crun -v
-          podman system service --time=0 &
-          systemctl --user enable --now podman.socket
+          #podman system service --time=0 &
+          systemctl --user start podman.socket
+          ls $XDG_RUNTIME_DIR/podman/podman.sock
 
       - name: Check podman sock
         run: |
