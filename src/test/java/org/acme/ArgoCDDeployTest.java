@@ -31,8 +31,6 @@ public class ArgoCDDeployTest {
 
     private static final String ARGOCD_NS = "argocd";
 
-    private static final String ARGOCD_DEPLOYMENT_SERVER_NAME = "argocd-server";
-
     private static final String ARGOCD_POD_APP_CONTROLLER_NAME = "argocd-application-controller-0";
     private static final String ARGOCD_POD_APPLICATIONSET_CONTROLLER_NAME = "argocd-applicationset-controller";
     private static final String ARGOCD_POD_SERVER_NAME = "argocd-server";
@@ -40,8 +38,6 @@ public class ArgoCDDeployTest {
     private static final String ARGOCD_POD_REPO_SERVER_NAME = "argocd-repo-server";
     private static final String ARGOCD_POD_DEX_SERVER_NAME = "argocd-dex-server";
     private static final String ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
-
-    private static final String DEPLOYMENT_STATUS_AVAILABLE = "Available";
 
     final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()));
 
