@@ -44,7 +44,6 @@ jobs:
       - name: Build kindcontainer testcontainer project
         id: build-kindcontainer
         run: |
-          #gradle publishToMavenLocal
           export SNAPSHOT_VERSION=$(gradle publishToMavenLocal --console=plain | grep 'Publishing to maven local' | awk -F':' '{print $NF}')
           echo "SNAPSHOT_VERSION=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
 
@@ -75,5 +74,7 @@ jobs:
       - name: Perform CI test
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
-          export DOCKER_HOST="unix:///var/run/docker.sock"
-          mvn test -Dtest=ArgoCDDeployTest
+          #export DOCKER_HOST="unix:///var/run/docker.sock"
+          mvn -B test -Dtest=ArgoCDDeployTest \
+            -Dquarkus-argocd.version="999-SNAPSHOT" \
+            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
