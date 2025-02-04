@@ -45,8 +45,8 @@ jobs:
         id: build-kindcontainer
         run: |
           #gradle publishToMavenLocal
-          set SNAPSHOT_VERSION $(gradle publishToMavenLocal --console=plain | grep 'Publishing to maven local' | awk -F':' '{print $NF}')
-          run: echo "SNAPSHOT_VERSION=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
+          export SNAPSHOT_VERSION=$(gradle publishToMavenLocal --console=plain | grep 'Publishing to maven local' | awk -F':' '{print $NF}')
+          echo "SNAPSHOT_VERSION=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
 
       - run: |
           echo Snapshot version of kind container: ${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
