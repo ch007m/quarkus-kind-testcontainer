@@ -31,6 +31,7 @@ jobs:
         run: |
           podman -v
           crun -v
+          podman system service --time=0 &
 
       - uses: actions/checkout@v4
         with:
