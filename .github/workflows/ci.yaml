@@ -63,8 +63,6 @@ jobs:
 
       - name: Build this project
         run: |
-          ls -la ~/.m2/repository/com/dajudge/kindcontainer/kindcontainer
-          ls -la ~/.m2/repository/io/quarkiverse/argocd/quarkus-argocd-deployment
           mvn -B clean install \
             -Dno-format \
             -DskipTests \
