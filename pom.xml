@@ -70,8 +70,7 @@
         <dependency>
             <groupId>com.dajudge.kindcontainer</groupId>
             <artifactId>kindcontainer</artifactId>
-            <!--<version>1738663884815-SNAPSHOT</version>-->
-            <version>LATEST</version>
+            <version>1738682136028-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
