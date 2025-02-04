@@ -32,6 +32,7 @@ jobs:
           podman -v
           crun -v
           podman system service --time=0 &
+          ls -la unix://${XDG_RUNTIME_DIR}/podman/podman.sock
 
       - uses: actions/checkout@v4
         with:
