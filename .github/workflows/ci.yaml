@@ -19,8 +19,9 @@ jobs:
           # Remove the old crun executable to let brew to install a newer one ...
           sudo apt-get remove crun
           sudo systemctl stop docker
+          sudo systemctl stop docker.socket
 
-      - name: Install podman and show dependencies
+      - name: Install podman v5 using homebrew
         run: |
           # What brew will install: https://ghcr.io/v2/homebrew/core/podman/manifests/5.3.1_1
           brew install podman
