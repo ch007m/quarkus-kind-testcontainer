@@ -23,9 +23,18 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
-      - name: Build
+      - name: Build kindcontainer testcontainer project
         run: |
           gradle publishToMavenLocal
+
+      - uses: guillermocalvo/gradle-properties@v3
+        id: properties
+        with:
+          output_file: ${{ github.output }}
+
+      - run: |
+          echo Project name: ${{ steps.properties.outputs.name }}
+          echo Project version: ${{ steps.properties.outputs.version }}
   #ci:
   #  runs-on: ubuntu-latest
   #  needs: build
