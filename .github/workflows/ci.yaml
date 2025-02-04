@@ -14,10 +14,11 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Remove old executables
+      - name: Remove old executable of crun and stop docker service
         run: |
           # Remove the old crun executable to let brew to install a newer one ...
           sudo apt-get remove crun
+          sudo systemctl stop docker
 
       - name: Install podman and show dependencies
         run: |
