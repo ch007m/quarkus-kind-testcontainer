@@ -51,6 +51,7 @@ jobs:
           output_file: ${{ github.output }}
 
       - run: |
+          echo All properties: ${{ steps.properties.outputs }}
           echo Project name: ${{ steps.properties.outputs.name }}
           echo Project version: ${{ steps.properties.outputs.version }}
 
