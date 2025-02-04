@@ -18,8 +18,8 @@ jobs:
         run: |
           # Remove the old crun executable to let brew to install a newer one ...
           sudo apt-get remove crun
-          sudo systemctl stop docker
           sudo systemctl stop docker.socket
+          sudo systemctl stop docker
 
       - name: Install podman v5 using homebrew
         run: |
@@ -74,7 +74,7 @@ jobs:
       - name: Perform CI test
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
-          #export DOCKER_HOST="unix:///var/run/docker.sock"
+          export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
           mvn -B test -Dtest=ArgoCDDeployTest \
             -Dquarkus-argocd.version="999-SNAPSHOT" \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
