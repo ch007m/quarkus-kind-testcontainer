@@ -40,7 +40,9 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: mvn -B clean install -Dno-format -DskipTests
+        run: |
+          ls -la ~/.m2/repository/com/dajudge/kindcontainer/kindcontainer
+          mvn -B clean install -Dno-format -DskipTests
 
       - name: Perform CI test
         run: |
