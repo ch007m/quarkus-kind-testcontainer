@@ -40,7 +40,8 @@ jobs:
           podman info | grep root
           ls -la ${XDG_RUNTIME_DIR}
           echo $(id -u)
-          ls -la unix://${XDG_RUNTIME_DIR}/podman/podman.sock 
+          #ls -la unix://${XDG_RUNTIME_DIR}/podman/podman.sock 
+          ls -la /usr/lib/systemd/user/podman.socket
 
       - uses: actions/checkout@v4
         with:
