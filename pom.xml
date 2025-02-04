@@ -49,8 +49,8 @@
         <dependency>
             <groupId>io.quarkiverse.argocd</groupId>
             <artifactId>quarkus-argocd-deployment</artifactId>
-            <version>999-SNAPSHOT</version>
-            <!-- <version>0.1.0</version> -->
+            <!-- <version>999-SNAPSHOT</version>-->
+            <version>0.1.1</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -70,7 +70,8 @@
         <dependency>
             <groupId>com.dajudge.kindcontainer</groupId>
             <artifactId>kindcontainer</artifactId>
-            <version>1738663884815-SNAPSHOT</version>
+            <!--<version>1738663884815-SNAPSHOT</version>-->
+            <version>LATEST</version>
             <scope>test</scope>
         </dependency>
         <dependency>
