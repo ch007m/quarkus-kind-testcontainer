@@ -73,7 +73,6 @@ public class ArgoCDDeployTest {
         for (HasMetadata item : items) {
             var res = client.resource(item).inNamespace("argocd");
             res.create();
-            //res.waitUntilReady(5, TimeUnit.SECONDS);
             assertNotNull(res);
         };
 
