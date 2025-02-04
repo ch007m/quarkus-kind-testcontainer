@@ -9,21 +9,23 @@ on:
 
 jobs:
   build:
-    - uses: actions/checkout@v4
-      with:
-        repository: ch007m/fork-kindcontainer.git
-        ref: enable-featuregate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ch007m/fork-kindcontainer.git
+          ref: enable-featuregate
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: 17
-        cache: 'gradle'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: 'gradle'
 
-    - name: Build
-      run: |
-        gradle publishToMavenLocal
+      - name: Build
+        run: |
+          gradle publishToMavenLocal
   ci:
     runs-on: ubuntu-latest
     steps:
