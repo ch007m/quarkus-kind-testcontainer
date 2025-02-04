@@ -42,18 +42,14 @@ jobs:
           java-version: 17
 
       - name: Build kindcontainer testcontainer project
+        id: build-kindcontainer
         run: |
-          gradle publishToMavenLocal
-
-      - uses: guillermocalvo/gradle-properties@v3
-        id: properties
-        with:
-          output_file: ${{ github.output }}
+          #gradle publishToMavenLocal
+          set SNAPSHOT_VERSION $(gradle publishToMavenLocal --console=plain | grep 'Publishing to maven local' | awk -F':' '{print $NF}')
+          run: echo "KINDCONTAINER_SNAPSHOT_VERSION=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
 
       - run: |
-          echo All properties: ${{ steps.properties.outputs }}
-          echo Project name: ${{ steps.properties.outputs.name }}
-          echo Project version: ${{ steps.properties.outputs.version }}
+          echo Snapshot version of kind container: ${{ steps.build-kindcontainer.outputs.KINDCONTAINER_SNAPSHOT_VERSION }}
 
       - uses: actions/checkout@v4
         with:
@@ -74,7 +70,7 @@ jobs:
             -Dno-format \
             -DskipTests \
             -Dquarkus-argocd.version="999-SNAPSHOT" \
-            -Dtestcontainer.version=${{ steps.properties.outputs.version }}
+            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.KINDCONTAINER_SNAPSHOT_VERSION }}
 
       - name: Perform CI test
         run: |
