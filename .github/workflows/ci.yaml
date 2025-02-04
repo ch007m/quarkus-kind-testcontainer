@@ -32,6 +32,15 @@ jobs:
           podman -v
           crun -v
           podman system service --time=0 &
+          systemctl --user enable --now podman.socket
+
+      - name: Check podman sock
+        run: |
+          podman info | grep sock
+          podman info | grep root
+          ls -la ${XDG_RUNTIME_DIR}
+          echo $(id -u)
+          ls -la unix://${XDG_RUNTIME_DIR}/podman/podman.sock 
 
       - uses: actions/checkout@v4
         with:
@@ -43,12 +52,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-
-      - name: Check podman sock
-        run: |
-          podman info | grep sock
-          podman info | grep root
-          ls -la unix://${XDG_RUNTIME_DIR}/podman/podman.sock    
 
       - name: Build kindcontainer testcontainer project
         id: build-kindcontainer
