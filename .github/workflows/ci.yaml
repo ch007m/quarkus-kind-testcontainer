@@ -51,8 +51,7 @@ jobs:
 
       - name: Build with Maven
         run: |
-          ls -la ~/.m2/repository/com/dajudge/kindcontainer/kindcontainer
-          mvn -B clean install -Dno-format -DskipTests
+          mvn -B clean install -Dno-format -DskipTests -Dtestcontainer.version=${{ steps.properties.outputs.version }}
 
       - name: Perform CI test
         run: |
