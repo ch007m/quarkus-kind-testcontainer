@@ -11,6 +11,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Remove old executables
+        run: |
+          # Remove the old crun executable to let brew to install a newer one ...
+          sudo apt-get remove crun
+
+      - name: Install podman and show dependencies
+        run: |
+          # What brew will install: https://ghcr.io/v2/homebrew/core/podman/manifests/5.3.1_1
+          brew install podman
+          brew services start podman
+
+      - name: Display versions
+        run: |
+          podman -v
+          crun -v
+          podman info
+
       - uses: actions/checkout@v4
         with:
           repository: ch007m/fork-kindcontainer.git
@@ -46,7 +66,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          cache: 'maven
+          cache: 'maven'
 
       - name: Build quarkus-argocd as not yet released with Maven
         run: |
