@@ -71,11 +71,13 @@ jobs:
         run: |
           mvn -B clean install -Dno-format -DskipTests    
 
-      - uses: actions/checkout@v4
-
       - name: Build this project
         run: |
-          mvn -B clean install -Dno-format -DskipTests -Dquarkus-argocd.version="999-SNAPSHOT" -Dtestcontainer.version=${{ steps.properties.outputs.version }}
+          mvn -B clean install \
+            -Dno-format \
+            -DskipTests \
+            -Dquarkus-argocd.version="999-SNAPSHOT" \
+            -Dtestcontainer.version=${{ steps.properties.outputs.version }}
 
       - name: Perform CI test
         run: |
