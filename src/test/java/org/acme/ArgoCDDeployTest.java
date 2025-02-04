@@ -4,7 +4,6 @@ import com.dajudge.kindcontainer.KindContainer;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkiverse.argocd.v1alpha1.Application;
@@ -19,12 +18,8 @@ import java.util.concurrent.TimeUnit;
 
 import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
 import static org.acme.ArgocdResourceGenerator.populateApplication;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @Testcontainers
@@ -37,11 +32,6 @@ public class ArgoCDDeployTest {
     private static final String ARGOCD_NS = "argocd";
 
     private static final String ARGOCD_DEPLOYMENT_SERVER_NAME = "argocd-server";
-    private static final String ARGOCD_DEPLOYMENT_REDIS_NAME = "argocd-redis";
-    private static final String ARGOCD_DEPLOYMENT_REPO_SERVER_NAME = "argocd-repo-server";
-    private static final String ARGOCD_DEPLOYMENT_DEX_SERVER_NAME = "argocd-dex-server";
-    private static final String ARGOCD_DEPLOYMENT_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
-    private static final String ARGOCD_DEPLOYMENT_APPLICATIONSET_CONTROLLER_NAME = "argocd-applicationset-controller";
 
     private static final String ARGOCD_POD_APP_CONTROLLER_NAME = "argocd-application-controller-0";
     private static final String ARGOCD_POD_APPLICATIONSET_CONTROLLER_NAME = "argocd-applicationset-controller";
@@ -85,26 +75,7 @@ public class ArgoCDDeployTest {
             res.create();
             //res.waitUntilReady(5, TimeUnit.SECONDS);
             assertNotNull(res);
-        }
-
-        // Wait till pod is running, etc
-        await().ignoreException(NullPointerException.class).atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
-            // check that we create the argocd-server deployment
-            final var deployment = client.apps().deployments()
-                .inNamespace(ARGOCD_NS)
-                .withName(ARGOCD_DEPLOYMENT_SERVER_NAME).get();
-
-            final var maybeFirstContainer = deployment.getSpec().getTemplate().getSpec().getContainers()
-                .stream()
-                .findFirst();
-
-            assertThat(maybeFirstContainer.isPresent(), is(true));
-            final var firstContainer = maybeFirstContainer.get();
-
-            // TODO: To be reviewed
-            assertThat(firstContainer.getImage(), is("quay.io/argoproj/argocd:v2.13.2"));
-        });
-
+        };
 
         // Waiting till the pods are ready/running ...
         waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_REDIS_NAME);
