@@ -159,6 +159,7 @@ jobs:
           echo "Extracted Container ID: $CONTAINER_ID"
           echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_ENV"
 
-      - name: Use Extracted Container ID
+      - name: Inspect Container
         run: |
           echo "The extracted container ID is: $CONTAINER_ID"
+          podman inspect $CONTAINER_ID
