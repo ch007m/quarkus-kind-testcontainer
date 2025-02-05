@@ -50,6 +50,9 @@ jobs:
           #
           # sudo podman-mac-helper install
           podman machine start --log-level debug
+          
+          # reconfigure timeouts inside podman vm to be compatible with java docker api
+          echo 'mkdir -p /etc/containers/containers.conf.d && printf "[engine]\nservice_timeout=91\n" > /etc/containers/containers.conf.d/service-timeout.conf && systemctl restart podman.socket' |  podman machine ssh --username root --
 
       - name: Expose the podman API and podman.socket
         if: matrix.os == 'ubuntu-latest'
