@@ -69,6 +69,27 @@ jobs:
           echo "Podman rootless: " $(podman info -f json | jq -r .host.security.rootless)
           echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)
 
+      - name: Set DOCKER_HOST for linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "Podman sock path: unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+          echo "PODMAN_SOCK_PATH=unix://${XDG_RUNTIME_DIR}/podman/podman.sock" >> $GITHUB_ENV
+
+      - name: Set DOCKER_HOST for macos
+        if: matrix.os == 'macos-13'
+        run: |
+          # >> /run/user/501/podman/podman.sock - OK
+          #echo "Podman sock path: $(podman info -f json | jq -r .host.remoteSocket.path)"
+          #echo "PODMAN_SOCK_PATH=$(podman info -f json | jq -r .host.remoteSocket.path)" >> $GITHUB_ENV  
+          
+          # >> /var/folders/28/g86pgjxj0wl1nkd_85c2krjw0000gn/T/podman/podman-machine-default.sock
+          echo "Podman sock path: " $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}'
+          echo "PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}'" >> $GITHUB_ENV
+          
+          # >> /var/run/docker.sock - OK 
+          # echo "Podman sock path: unix:///var/run/docker.sock"
+          # echo "PODMAN_SOCK_PATH=unix:///var/run/docker.sock" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
         with:
           repository: ch007m/fork-kindcontainer.git
@@ -107,27 +128,6 @@ jobs:
             -DskipTests \
             -Dquarkus-argocd.version="999-SNAPSHOT" \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
-
-      - name: Set DOCKER_HOST for linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          echo "Podman sock path: unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
-          echo "PODMAN_SOCK_PATH=unix://${XDG_RUNTIME_DIR}/podman/podman.sock" >> $GITHUB_ENV
-
-      - name: Set DOCKER_HOST for macos
-        if: matrix.os == 'macos-13'
-        run: |
-          # >> /run/user/501/podman/podman.sock - OK
-          #echo "Podman sock path: $(podman info -f json | jq -r .host.remoteSocket.path)"
-          #echo "PODMAN_SOCK_PATH=$(podman info -f json | jq -r .host.remoteSocket.path)" >> $GITHUB_ENV  
-          
-          # >> /var/folders/28/g86pgjxj0wl1nkd_85c2krjw0000gn/T/podman/podman-machine-default.sock
-          echo "Podman sock path: " $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}'
-          echo "PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}'" >> $GITHUB_ENV
-          
-          # >> /var/run/docker.sock - OK 
-          # echo "Podman sock path: unix:///var/run/docker.sock"
-          # echo "PODMAN_SOCK_PATH=unix:///var/run/docker.sock" >> $GITHUB_ENV
 
       - name: Perform CI test
         env:
