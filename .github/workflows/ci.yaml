@@ -89,6 +89,10 @@ jobs:
           # >> /var/folders/28/g86pgjxj0wl1nkd_85c2krjw0000gn/T/podman/podman-machine-default.sock
           # echo "Podman sock path: $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
           # echo PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}') >> $GITHUB_ENV
+          
+          echo "Check if there is a docker auth config file ..."
+          ls -la $HOME/.docker/config.json
+          cat $HOME/.docker/config.json
 
       - uses: actions/checkout@v4
         with:
