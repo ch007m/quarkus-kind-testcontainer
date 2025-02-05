@@ -78,7 +78,6 @@ jobs:
       - name: Set DOCKER_HOST for macos
         if: matrix.os == 'macos-13'
         run: |
-          set -x
           # >> /run/user/501/podman/podman.sock - OK
           #echo "Podman sock path: $(podman info -f json | jq -r .host.remoteSocket.path)"
           #echo "PODMAN_SOCK_PATH=$(podman info -f json | jq -r .host.remoteSocket.path)" >> $GITHUB_ENV  
