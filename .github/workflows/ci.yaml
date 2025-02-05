@@ -98,7 +98,7 @@ jobs:
             --compat-auth-file $HOME/.docker/config.json
           
           echo "Let's pull an image ...."
-          podman pull kindest/node:v1.31.0
+          podman pull kindest/node:v1.31.0 --log-level debug
 
       #- name: Verify if there is a docker auth config file
       #  run: |
