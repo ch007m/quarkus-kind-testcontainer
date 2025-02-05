@@ -96,6 +96,9 @@ jobs:
             -u ${{ vars.DOCKERHUB_USERNAME }} \
             -p ${{ secrets.DOCKERHUB_TOKEN }} \
             --compat-auth-file $HOME/.docker/config.json
+          
+          echo "Let's pull an image ...."
+          podman pull kindest/node:v1.31.0
 
       #- name: Verify if there is a docker auth config file
       #  run: |
