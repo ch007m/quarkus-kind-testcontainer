@@ -117,7 +117,6 @@ jobs:
           mvn -B clean install \
             -Dno-format \
             -DskipTests \
-            -Dquarkus-argocd.version="999-SNAPSHOT" \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
 
       - name: Perform CI test
@@ -129,5 +128,4 @@ jobs:
           echo "DOCKER_HOST is: $PODMAN_SOCK_PATH" 
 
           mvn -B test -Dtest=ArgoCDDeployTest \
-            -Dquarkus-argocd.version="999-SNAPSHOT" \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
