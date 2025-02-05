@@ -116,6 +116,7 @@ jobs:
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
           export DOCKER_HOST=$PODMAN_SOCK_PATH
+          echo "DOCKER_HOST is: $PODMAN_SOCK_PATH" 
 
           mvn -B test -Dtest=ArgoCDDeployTest \
             -Dquarkus-argocd.version="999-SNAPSHOT" \
