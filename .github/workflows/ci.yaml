@@ -27,9 +27,9 @@ jobs:
           brew install podman
           brew services start podman
 
-      - name: Check podman and crun versions
+      - name: Enable podman.socket
         run: |
-          podman system service --time=0 &
+          #podman system service --time=0 &
           systemctl --user enable --now podman.socket
 
       - name: Podman information
