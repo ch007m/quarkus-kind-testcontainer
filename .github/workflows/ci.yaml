@@ -34,7 +34,15 @@ jobs:
 
       - name: Install and launch podman service
         if: matrix.os == 'ubuntu-latest'
-        run: brew services start podman
+        run: |
+          brew services start podman
+          
+          # reconfigure timeouts for podman to be compatible with java docker api
+          sudo mkdir -p /etc/containers/containers.conf.d
+          printf "[engine]\nservice_timeout=91\n" | sudo tee -a /etc/containers/containers.conf.d/service-timeout.conf
+
+          # restart to allow config to take effect
+          brew services restart podman
 
       - name: Create linux's vm on macos
         if: matrix.os == 'macos-13'
