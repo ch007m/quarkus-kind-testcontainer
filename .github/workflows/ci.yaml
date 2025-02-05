@@ -39,6 +39,11 @@ jobs:
         if: matrix.os == 'macos-13'
         run: |
           podman machine init
+          
+          # By default, the podman-mac-helper agent is not started and we could not use the following sock path: /var/run/docker.sock
+          # which is a symbolic link pointing to the VM's internal path: /var/folders/28/g86pgjxj0wl1nkd_85c2krjw0000gn/T/podman/podman-machine-default.sock
+          # This is why it is needed to install it using the following help (enabled by default using podman desktop)
+          sudo podman-mac-helper install
           podman machine start --log-level debug
 
       - name: Expose the podman API and podman.socket
