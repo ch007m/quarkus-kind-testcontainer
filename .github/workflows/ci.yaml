@@ -57,7 +57,8 @@ jobs:
       - name: Expose the podman API and podman.socket
         if: matrix.os == 'ubuntu-latest'
         run: |
-          podman system service --time=0 &
+          # As both commands do the same, then we will use instead systemd
+          # podman system service --time=0 &
           systemctl --user enable --now podman.socket
 
       - name: Podman service status on Linux
