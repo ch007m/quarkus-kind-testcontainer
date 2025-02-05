@@ -9,12 +9,16 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-13, ubuntu-latest]
+    runs-on:
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Remove old executable of crun and stop docker service
+      - if: matrix.os == 'ubuntu-latest'
+        name: Remove old executable of crun and stop docker service
         run: |
           # Remove the old crun executable to let brew to install a newer one ...
           sudo apt-get remove crun
@@ -27,7 +31,14 @@ jobs:
           brew install podman
           brew services start podman
 
-      - name: Enable podman.socket
+      - if: matrix.os == 'macos-13'
+        name: Create VM
+        run: |
+          podman machine init
+          podman machine start --log-level debug
+
+      - if: matrix.os == 'ubuntu-latest'
+        name: Enable podman.socket
         run: |
           podman system service --time=0 &
           systemctl --user enable --now podman.socket
@@ -37,7 +48,10 @@ jobs:
           echo "Podman version: " $(podman info -f json | jq -r .version.Version)
           echo "Podman rootless: " $(podman info -f json | jq -r .host.security.rootless)
           echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)
-          
+
+      - if: matrix.os == 'ubuntu-latest'
+        name: Podman service status
+        run: |  
           systemctl status podman &
           systemctl --user status podman.socket &
 
