@@ -88,8 +88,8 @@ jobs:
           # echo "PODMAN_SOCK_PATH=unix:///var/run/docker.sock" >> $GITHUB_ENV
           
           # >> /var/folders/28/g86pgjxj0wl1nkd_85c2krjw0000gn/T/podman/podman-machine-default.sock
-          echo "Podman sock path: $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}'"
-          echo PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}' >> $GITHUB_ENV
+          echo "Podman sock path: $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+          echo PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}') >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
         with:
