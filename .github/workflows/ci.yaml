@@ -72,11 +72,11 @@ jobs:
           podman system service --time=0 &
           # systemctl --user enable --now podman.socket
 
-      - name: Podman service status on Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          systemctl status podman &
-          systemctl --user status podman.socket &
+      #- name: Podman service status on Linux
+      #  if: matrix.os == 'ubuntu-latest'
+      #  run: |
+      #    systemctl status podman &
+      #    systemctl --user status podman.socket &
 
       - name: Podman information
         run: |
