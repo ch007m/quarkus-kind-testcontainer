@@ -31,8 +31,8 @@ jobs:
         run: |
           podman -v
           crun -v
-          #podman system service --time=0 &
-          systemctl --user start podman.socket
+          podman system service --time=0 &
+          systemctl --user enable --now podman.socket
           ls $XDG_RUNTIME_DIR/podman/podman.sock
 
       - name: Check podman sock
@@ -41,8 +41,7 @@ jobs:
           podman info | grep root
           ls -la ${XDG_RUNTIME_DIR}
           echo $(id -u)
-          #ls -la unix://${XDG_RUNTIME_DIR}/podman/podman.sock 
-          ls -la /usr/lib/systemd/user/podman.socket
+          ls -la unix://${XDG_RUNTIME_DIR}/podman/podman.sock
 
       - uses: actions/checkout@v4
         with:
@@ -86,8 +85,8 @@ jobs:
       - name: Perform CI test
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
-          #export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
-          export DOCKER_HOST="unix:///usr/lib/systemd/user/podman.socket"
+          export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+          #export DOCKER_HOST="unix:///usr/lib/systemd/user/podman.socket"
           mvn -B test -Dtest=ArgoCDDeployTest \
             -Dquarkus-argocd.version="999-SNAPSHOT" \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
