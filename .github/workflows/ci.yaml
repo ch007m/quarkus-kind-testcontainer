@@ -38,8 +38,8 @@ jobs:
           echo "Podman rootless: " $(podman info -f json | jq -r .host.security.rootless)
           echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)
           
-          systemctl status podman > /dev/null 2>&1
-          systemctl --user status podman.socket > /dev/null 2>&1
+          systemctl status podman 1> /dev/null
+          systemctl --user status podman.socket 1> /dev/null
 
       - uses: actions/checkout@v4
         with:
