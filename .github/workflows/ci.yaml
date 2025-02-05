@@ -39,7 +39,7 @@ jobs:
           echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)
           
           systemctl status podman
-          systemctl status podman.socket
+          systemctl --user status podman.socket
 
       - uses: actions/checkout@v4
         with:
