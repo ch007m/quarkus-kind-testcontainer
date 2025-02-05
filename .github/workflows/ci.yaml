@@ -23,6 +23,7 @@ jobs:
         run: |
           # Remove the old crun executable to let brew to install a newer one ...
           sudo apt-get remove crun
+          sudo apt-get remove podman
           sudo systemctl stop docker.socket
           sudo systemctl stop docker
 
