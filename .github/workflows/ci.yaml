@@ -97,10 +97,10 @@ jobs:
             -p ${{ secrets.DOCKERHUB_TOKEN }} \
             --compat-auth-file $HOME/.docker/config.json
 
-      - name: Verify if there is a docker auth config file
-        run: |
-          echo "Check if there is a docker auth config file ..."
-          cat $HOME/.docker/config.json
+      #- name: Verify if there is a docker auth config file
+      #  run: |
+      #    echo "Check if there is a docker auth config file ..."
+      #    cat $HOME/.docker/config.json
 
       - uses: actions/checkout@v4
         with:
