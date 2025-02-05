@@ -82,8 +82,8 @@ jobs:
         if: matrix.os == 'macos-13'
         run: |
           # >> /run/user/501/podman/podman.sock - OK
-          #echo "Podman sock path: $(podman info -f json | jq -r .host.remoteSocket.path)"
-          #echo "PODMAN_SOCK_PATH=$(podman info -f json | jq -r .host.remoteSocket.path)" >> $GITHUB_ENV  
+          # echo "Podman sock path: $(podman info -f json | jq -r .host.remoteSocket.path)"
+          # echo "PODMAN_SOCK_PATH=$(podman info -f json | jq -r .host.remoteSocket.path)" >> $GITHUB_ENV  
 
           # >> /var/run/docker.sock - OK 
           # echo "Podman sock path: unix:///var/run/docker.sock"
@@ -101,7 +101,7 @@ jobs:
             --compat-auth-file $HOME/.docker/config.json
           
           echo "Let's pull an image ...."
-          podman pull kindest/node:v1.31.0 --log-level debug
+          podman machine ssh "podman pull kindest/node:v1.31.0 "
 
       #- name: Verify if there is a docker auth config file
       #  run: |
