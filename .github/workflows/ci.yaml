@@ -58,7 +58,9 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           # As both commands do the same, then we will use instead systemd
-          # podman system service --time=0 &
+          # We got such an error without running the cvommand: podman system service --time=0 &
+          # 2025-02-05 16:39:57,945 ERROR [tc.kin.31.0] (main) Could not start container: com.github.dockerjava.api.exception.InternalServerErrorException: Status 500: {"cause":"OCI runtime error","message":"runc: runc create failed: invalid mount \u0026{Source:/home/runner/.local/share/containers/storage/volumes/kindcontainer-0dac5552-cc4f-4317-a058-103456f8131e/_data Destination:/var/lib/containerd Device:bind Flags:20486 ClearedFlags:1 PropagationFlags:[278528] Data:nocopy Relabel: RecAttr:\u003cnil\u003e Extensions:0 IDMapping:\u003cnil\u003e}: bind mounts cannot have any filesystem-specific options applied: OCI runtime error","response":500}
+          podman system service --time=0 &
           systemctl --user enable --now podman.socket
 
       - name: Podman service status on Linux
@@ -134,20 +136,13 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Build this project
-        run: |
-          mvn -B clean install \
-            -Dno-format \
-            -DskipTests \
-            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
-
       - name: Perform CI test
         env:
           PODMAN_SOCK_PATH: ${{ env.PODMAN_SOCK_PATH }}
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
           # export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
-          export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=$PODMAN_SOCK_PATH
+          # export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=$PODMAN_SOCK_PATH
           export DOCKER_HOST=$PODMAN_SOCK_PATH
           export DOCKER_CONFIG=$HOME/.docker
 
