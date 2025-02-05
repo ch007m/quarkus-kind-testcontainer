@@ -47,17 +47,17 @@ jobs:
           podman system service --time=0 &
           systemctl --user enable --now podman.socket
 
+      - name: Podman service status on Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          systemctl status podman &
+          systemctl --user status podman.socket &
+
       - name: Podman information
         run: |
           echo "Podman version: " $(podman info -f json | jq -r .version.Version)
           echo "Podman rootless: " $(podman info -f json | jq -r .host.security.rootless)
           echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)
-
-      - name: Podman service status on Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |  
-          systemctl status podman &
-          systemctl --user status podman.socket &
 
       - uses: actions/checkout@v4
         with:
@@ -98,10 +98,24 @@ jobs:
             -Dquarkus-argocd.version="999-SNAPSHOT" \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
 
+      - name: Set DOCKER_HOST for linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "Podman sock path: unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+          echo "PODMAN_SOCK_PATH=unix://${XDG_RUNTIME_DIR}/podman/podman.sock" >> $GITHUB_ENV
+
+      - name: Set DOCKER_HOST for macos
+        if: matrix.os == 'macos-13'
+        run: |
+          echo "Podman sock path: unix:///var/run/docker.sock"
+          echo "PODMAN_SOCK_PATH=unix:///var/run/docker.sock" >> $GITHUB_ENV    
+
       - name: Perform CI test
+        env:
+          PODMAN_SOCK_PATH: ${{ env.PODMAN_SOCK_PATH }}
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
-          export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+          export DOCKER_HOST=$PODMAN_SOCK_PATH
 
           mvn -B test -Dtest=ArgoCDDeployTest \
             -Dquarkus-argocd.version="999-SNAPSHOT" \
