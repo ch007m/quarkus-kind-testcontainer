@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-13, ubuntu-latest]
-    runs-on:
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -31,14 +30,14 @@ jobs:
           brew install podman
           brew services start podman
 
-      - if: matrix.os == 'macos-13'
-        name: Create VM
+      - name: Create linux's vm on macos
+        if: matrix.os == 'macos-13'
         run: |
           podman machine init
           podman machine start --log-level debug
 
-      - if: matrix.os == 'ubuntu-latest'
-        name: Enable podman.socket
+      - name: Expose the podman API and podman.socket
+        if: matrix.os == 'ubuntu-latest'
         run: |
           podman system service --time=0 &
           systemctl --user enable --now podman.socket
@@ -49,8 +48,8 @@ jobs:
           echo "Podman rootless: " $(podman info -f json | jq -r .host.security.rootless)
           echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)
 
-      - if: matrix.os == 'ubuntu-latest'
-        name: Podman service status
+      - name: Podman service status on Linux
+        if: matrix.os == 'ubuntu-latest'
         run: |  
           systemctl status podman &
           systemctl --user status podman.socket &
