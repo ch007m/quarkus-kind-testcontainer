@@ -29,7 +29,7 @@ jobs:
 
       - name: Enable podman.socket
         run: |
-          #podman system service --time=0 &
+          podman system service --time=0 &
           systemctl --user enable --now podman.socket
 
       - name: Podman information
@@ -81,7 +81,7 @@ jobs:
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
           export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
-          #export DOCKER_HOST="unix:///usr/lib/systemd/user/podman.socket"
+
           mvn -B test -Dtest=ArgoCDDeployTest \
             -Dquarkus-argocd.version="999-SNAPSHOT" \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
