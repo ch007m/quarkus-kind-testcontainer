@@ -107,8 +107,8 @@ jobs:
       - name: Set DOCKER_HOST for macos
         if: matrix.os == 'macos-13'
         run: |
-          echo "Podman sock path: unix:///var/run/docker.sock"
-          echo "PODMAN_SOCK_PATH=unix:///var/run/docker.sock" >> $GITHUB_ENV    
+          echo "Podman sock path: $(podman info -f json | jq -r .host.remoteSocket.path)"
+          echo "PODMAN_SOCK_PATH=$(podman info -f json | jq -r .host.remoteSocket.path)" >> $GITHUB_ENV    
 
       - name: Perform CI test
         env:
