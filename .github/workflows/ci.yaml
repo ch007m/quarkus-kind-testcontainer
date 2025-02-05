@@ -124,6 +124,7 @@ jobs:
           PODMAN_SOCK_PATH: ${{ env.PODMAN_SOCK_PATH }}
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
+          export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
           export DOCKER_HOST=$PODMAN_SOCK_PATH
           echo "DOCKER_HOST is: $PODMAN_SOCK_PATH" 
 
