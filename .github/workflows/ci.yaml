@@ -99,7 +99,10 @@ jobs:
             -u ${{ vars.DOCKERHUB_USERNAME }} \
             -p ${{ secrets.DOCKERHUB_TOKEN }} \
             --compat-auth-file $HOME/.docker/config.json
-          
+
+      - name: Let's pull an image within the VM
+        if: matrix.os == 'macos-13'
+        run: |          
           echo "Let's pull an image ...."
           podman machine ssh "podman pull kindest/node:v1.31.0 "
 
