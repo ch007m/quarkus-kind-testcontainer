@@ -142,7 +142,8 @@ jobs:
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
           # export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
-          # export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=$PODMAN_SOCK_PATH
+          
+          export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=$PODMAN_SOCK_PATH
           export DOCKER_HOST=$PODMAN_SOCK_PATH
           export DOCKER_CONFIG=$HOME/.docker
 
