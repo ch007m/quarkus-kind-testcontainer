@@ -138,7 +138,7 @@ jobs:
           export TESTCONTAINERS_RYUK_DISABLED=true
           export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
           export DOCKER_HOST=$PODMAN_SOCK_PATH
-          export DOCKER_CONFIG=$HOME/.docker/config.json
+          export DOCKER_CONFIG=$HOME/.docker
 
           mvn -B test -Dtest=ArgoCDDeployTest \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
