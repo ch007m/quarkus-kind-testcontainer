@@ -108,16 +108,7 @@ jobs:
           echo "SNAPSHOT_VERSION=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
 
       - run: |
-          echo Snapshot version of kind container: ${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
-
-      - uses: actions/checkout@v4
-        with:
-          repository: quarkiverse/quarkus-argocd.git
-          ref: main
-
-      - name: Build quarkus-argocd as not yet released with Maven
-        run: |
-          mvn -B clean install -Dno-format -DskipTests    
+          echo Snapshot version of kind container: ${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }} 
 
       - uses: actions/checkout@v4
 
