@@ -48,7 +48,7 @@ jobs:
           #
           # Remark: It is enabled by default using podman desktop ! 
           #
-          sudo podman-mac-helper install
+          # sudo podman-mac-helper install
           podman machine start --log-level debug
 
       - name: Expose the podman API and podman.socket
@@ -83,12 +83,12 @@ jobs:
           #echo "PODMAN_SOCK_PATH=$(podman info -f json | jq -r .host.remoteSocket.path)" >> $GITHUB_ENV  
 
           # >> /var/run/docker.sock - OK 
-          echo "Podman sock path: unix:///var/run/docker.sock"
-          echo "PODMAN_SOCK_PATH=unix:///var/run/docker.sock" >> $GITHUB_ENV
+          # echo "Podman sock path: unix:///var/run/docker.sock"
+          # echo "PODMAN_SOCK_PATH=unix:///var/run/docker.sock" >> $GITHUB_ENV
           
           # >> /var/folders/28/g86pgjxj0wl1nkd_85c2krjw0000gn/T/podman/podman-machine-default.sock
-          # echo "Podman sock path: $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
-          # echo PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}') >> $GITHUB_ENV
+          echo "Podman sock path: $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+          echo PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}') >> $GITHUB_ENV
 
       - name: Login to Docker Hub
         run: |
@@ -139,7 +139,7 @@ jobs:
           PODMAN_SOCK_PATH: ${{ env.PODMAN_SOCK_PATH }}
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
-          export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+          # export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
           export DOCKER_HOST=$PODMAN_SOCK_PATH
           export DOCKER_CONFIG=$HOME/.docker
 
