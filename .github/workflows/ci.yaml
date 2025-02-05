@@ -29,21 +29,14 @@ jobs:
 
       - name: Check podman and crun versions
         run: |
-          podman -v
-          crun -v
           podman system service --time=0 &
           systemctl --user enable --now podman.socket
-          ls $XDG_RUNTIME_DIR/podman/podman.sock
 
-      - name: Check podman sock
+      - name: Podman information
         run: |
-          podman info | grep sock
-          
-          podman info | grep root
-
-          echo $(id -u)
-          
-          ls -la ${XDG_RUNTIME_DIR}/podman/podman.sock
+          echo "Podman version: " $(podman info -f json | jq -r .version.Version)
+          echo "Podman rootless: " $(podman info -f json | jq -r .host.security.rootless)
+          echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)         
 
       - uses: actions/checkout@v4
         with:
