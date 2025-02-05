@@ -157,17 +157,18 @@ jobs:
           export DOCKER_CONFIG=$HOME/.docker
 
           mvn -B test -Dtest=ArgoCDDeployTest \
-            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }} \
-            | tee app.log
+            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }} 
+          # | tee app.log
 
-      - name: Get the log and extract the container id
-        run: |
-          CONTAINER_ID=$(grep -oE '[a-f0-9]{64}' app.log | tail -n1)
-          echo "Extracted Container ID: $CONTAINER_ID"
-          echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_ENV"
+      #- name: Get the log and extract the container id
+      #  run: |
+      #    CONTAINER_ID=$(grep -oE '[a-f0-9]{64}' app.log | tail -n1)
+      #    echo "Extracted Container ID: $CONTAINER_ID"
+      #    echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_ENV"
 
-      - name: Inspect Container if failure
-        # if: failure()
-        run: |
-          echo "The extracted container ID is: $CONTAINER_ID"
-          podman inspect $CONTAINER_ID
+      # It raises an error as container don't exist anymore
+      # - name: Inspect Container if failure
+      #   # if: failure()
+      #   run: |
+      #     echo "The extracted container ID is: $CONTAINER_ID"
+      #     podman inspect $CONTAINER_ID
