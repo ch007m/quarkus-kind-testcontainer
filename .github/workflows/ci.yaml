@@ -28,9 +28,12 @@ jobs:
 
       - name: Install podman v5 using homebrew
         run: |
-          # What brew will install: https://ghcr.io/v2/homebrew/core/podman/manifests/5.3.1_1
+          # What brew will install: https://ghcr.io/v2/homebrew/core/podman/manifests/5.3.2_1
           brew install podman
-          brew services start podman
+
+      - name: Install and launch podman service
+        if: matrix.os == 'ubuntu-latest'
+        run: brew services start podman
 
       - name: Create linux's vm on macos
         if: matrix.os == 'macos-13'
