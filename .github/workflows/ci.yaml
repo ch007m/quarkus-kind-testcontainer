@@ -84,13 +84,14 @@ jobs:
           echo "Podman rootless: " $(podman info -f json | jq -r .host.security.rootless)
           echo "Podman sock path: " $(podman info -f json | jq -r .host.remoteSocket.path)
 
-      - name: Set DOCKER_HOST for linux
+      - name: Set DOCKER_HOST for linux and env
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo "Podman sock path: unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
           echo "PODMAN_SOCK_PATH=${XDG_RUNTIME_DIR}/podman/podman.sock" >> $GITHUB_ENV
+          echo "ARGOCD_RESOURCE_TIMEOUT=180" >> $GITHUB_ENV
 
-      - name: Set DOCKER_HOST for macos
+      - name: Set DOCKER_HOST for macos and env
         if: matrix.os == 'macos-13'
         run: |
           # >> /run/user/501/podman/podman.sock - OK
@@ -104,6 +105,8 @@ jobs:
           # >> /var/folders/28/g86pgjxj0wl1nkd_85c2krjw0000gn/T/podman/podman-machine-default.sock
           echo "Podman sock path: $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
           echo PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}') >> $GITHUB_ENV
+          
+          echo "ARGOCD_RESOURCE_TIMEOUT=600" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
         run: |
@@ -148,6 +151,7 @@ jobs:
       - name: Perform CI test
         env:
           PODMAN_SOCK_PATH: ${{ env.PODMAN_SOCK_PATH }}
+          ARGOCD_RESOURCE_TIMEOUT: ${{ env.ARGOCD_RESOURCE_TIMEOUT }}
         run: |
           export TESTCONTAINERS_RYUK_DISABLED=true
           
@@ -157,7 +161,7 @@ jobs:
           export DOCKER_HOST=unix://$PODMAN_SOCK_PATH
           export DOCKER_CONFIG=$HOME/.docker
           
-          export ARGOCD_RESOURCE_TIMEOUT=180
+          export ARGOCD_RESOURCE_TIMEOUT=$ARGOCD_RESOURCE_TIMEOUT
 
           mvn -B test -Dtest=ArgoCDDeployTest \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}

@@ -67,9 +67,7 @@ public class ArgoCDDeployTest {
     public void deployArgoCD() {
         if (System.getenv("ARGOCD_RESOURCE_TIMEOUT") != null) {
             timeOut = Long.parseLong(System.getenv("ARGOCD_RESOURCE_TIMEOUT"));
-            LOG.info("Timeout: {}", timeOut);
-        } else {
-            LOG.info("Env: {}", System.getenv());
+            LOG.info("Kubernetes waiting resource - Timeout: {}", timeOut);
         }
 
         List<HasMetadata> items = client.load(getClass().getResourceAsStream("/argocd.yml")).items();
