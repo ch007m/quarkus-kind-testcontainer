@@ -4,6 +4,7 @@ import com.dajudge.kindcontainer.KindContainer;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkiverse.argocd.v1alpha1.Application;
@@ -17,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
 import static org.acme.ArgocdResourceGenerator.populateApplication;
@@ -69,13 +71,18 @@ public class ArgoCDDeployTest {
         }
 
         List<HasMetadata> items = client.load(getClass().getResourceAsStream("/argocd.yml")).items();
-        assertEquals(59, items.size());
 
         // Let's create the argocd namespace to deploy the resources
         client.namespaces().resource(new NamespaceBuilder().withNewMetadata().withName(ARGOCD_NS).endMetadata().build()).create();
 
-        // Deploy the different resources: Service, CRD, Deployment, ConfigMap
-        for (HasMetadata item : items) {
+        // Deploy the different resources: Service, CRD, Deployment, ConfigMap except the Notification and Dex server
+        List<HasMetadata> filteredItems = items.stream()
+            .filter(r -> !(r instanceof Deployment &&
+                (ARGOCD_POD_DEX_SERVER_NAME.equals(r.getMetadata().getName()) || ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME.equals(r.getMetadata().getName()))))
+            .collect(Collectors.toList());
+
+        assertEquals(57, filteredItems.size());
+        for (HasMetadata item : filteredItems) {
             var res = client.resource(item).inNamespace("argocd");
             res.create();
             assertNotNull(res);
