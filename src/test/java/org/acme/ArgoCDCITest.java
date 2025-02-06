@@ -94,8 +94,13 @@ public class ArgoCDCITest extends BaseContainer {
     @Test
     public void testCaseOne() {
 
-        // Populate the Argocd Application resource
-        // Namespace: argocd control's plane - argocd
+        /*
+           Test case
+           Use the Default Argocd AppProject
+           Populate an Argocd Application
+           Deploy the Application using the argocd control's plane
+
+         */
         Config config = new Config();
         config.setDestinationNamespace("argocd");
         config.setApplicationName("test-1");
