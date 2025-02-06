@@ -132,5 +132,5 @@ jobs:
           
           export ARGOCD_RESOURCE_TIMEOUT=$ARGOCD_RESOURCE_TIMEOUT
 
-          mvn -B test -Dtest=ArgoCDDeployTest \
+          mvn -B test \
             -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
