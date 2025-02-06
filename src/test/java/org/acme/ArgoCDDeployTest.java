@@ -63,7 +63,7 @@ public class ArgoCDDeployTest {
 
     @Test
     public void deployArgoCD() {
-        if (System.getentu("argocd.resource.timeout") != null) {
+        if (System.getenv("argocd.resource.timeout") != null) {
             timeOut = Long.parseLong(System.getProperty("argocd.resource.timeout"));
             LOG.info("Timeout: {}", timeOut);
         }
