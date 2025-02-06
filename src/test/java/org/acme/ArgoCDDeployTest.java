@@ -65,9 +65,11 @@ public class ArgoCDDeployTest {
 
     @Test
     public void deployArgoCD() {
-        if (System.getenv("argocd.resource.timeout") != null) {
-            timeOut = Long.parseLong(System.getenv("argocd.resource.timeout"));
+        if (System.getenv("ARGOCD_RESOURCE_TIMEOUT") != null) {
+            timeOut = Long.parseLong(System.getenv("ARGOCD_RESOURCE_TIMEOUT"));
             LOG.info("Timeout: {}", timeOut);
+        } else {
+            LOG.info("Env: {}", System.getenv());
         }
 
         List<HasMetadata> items = client.load(getClass().getResourceAsStream("/argocd.yml")).items();

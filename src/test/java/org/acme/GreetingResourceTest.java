@@ -9,6 +9,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,10 +48,13 @@ class GreetingResourceTest {
     }
 
     @Test
-    public void testGreeting() {
-        if (System.getenv("argocd.resource.timeout") != null) {
-            timeOut = Long.parseLong(System.getenv("argocd.resource.timeout"));
-            System.out.println("Timeout: " + timeOut);
+    public void testEnvArgoCD() {
+        if (System.getenv("ARGOCD_RESOURCE_TIMEOUT") != null) {
+            timeOut = Long.parseLong(System.getenv("ARGOCD_RESOURCE_TIMEOUT"));
+            assertEquals(180, timeOut);
+        } else {
+            System.out.println("Env: ");
+            Arrays.asList(System.getenv()).stream().forEach(System.out::println);
         }
     }
 
