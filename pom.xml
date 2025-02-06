@@ -16,6 +16,7 @@
         <quarkus.platform.version>3.18.1</quarkus.platform.version>
         <quarkus-argocd.version>0.2.0</quarkus-argocd.version>
         <testcontainer.version>1.4.7</testcontainer.version>
+        <!-- <testcontainer.version>1738827454679-SNAPSHOT</testcontainer.version> -->
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
     </properties>

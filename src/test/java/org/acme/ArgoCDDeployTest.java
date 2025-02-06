@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkiverse.argocd.v1alpha1.Application;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
 import static org.acme.ArgocdResourceGenerator.populateApplication;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 
 @Testcontainers
 public class ArgoCDDeployTest {
@@ -40,8 +40,8 @@ public class ArgoCDDeployTest {
     private static final String ARGOCD_POD_DEX_SERVER_NAME = "argocd-dex-server";
     private static final String ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
 
-    @ConfigProperty(name = "argocd.resource.timeout", defaultValue = "1")
-    public long timeOut;
+    //@ConfigProperty(name = "argocd.resource.timeout", defaultValue = "1")
+    public static long timeOut = 1;
 
     final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()));
 
@@ -63,6 +63,11 @@ public class ArgoCDDeployTest {
 
     @Test
     public void deployArgoCD() {
+        if (System.getentu("argocd.resource.timeout") != null) {
+            timeOut = Long.parseLong(System.getProperty("argocd.resource.timeout"));
+            LOG.info("Timeout: {}", timeOut);
+        }
+
         List<HasMetadata> items = client.load(getClass().getResourceAsStream("/argocd.yml")).items();
         assertEquals(59, items.size());
 
