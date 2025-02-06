@@ -158,7 +158,8 @@ jobs:
           export DOCKER_CONFIG=$HOME/.docker
 
           mvn -B test -Dtest=ArgoCDDeployTest \
-            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }} 
+            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }} \
+            -Dargocd.resource.timeout=180
           # | tee app.log
 
       #- name: Get the log and extract the container id
