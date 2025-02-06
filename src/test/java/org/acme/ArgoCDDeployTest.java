@@ -41,7 +41,7 @@ public class ArgoCDDeployTest {
     private static final String ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
 
     @ConfigProperty(name = "argocd.resource.timeout", defaultValue = "1")
-    private long timeOut;
+    public long timeOut;
 
     final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()));
 
