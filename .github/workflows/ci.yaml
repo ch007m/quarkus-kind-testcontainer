@@ -107,7 +107,7 @@ jobs:
           echo "Podman sock path: $(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
           echo PODMAN_SOCK_PATH=$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}') >> $GITHUB_ENV
           
-          echo "ARGOCD_RESOURCE_TIMEOUT=600" >> $GITHUB_ENV
+          echo "ARGOCD_RESOURCE_TIMEOUT=360" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
         run: |

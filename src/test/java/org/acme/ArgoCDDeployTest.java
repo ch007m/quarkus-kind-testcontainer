@@ -75,7 +75,7 @@ public class ArgoCDDeployTest {
         // Let's create the argocd namespace to deploy the resources
         client.namespaces().resource(new NamespaceBuilder().withNewMetadata().withName(ARGOCD_NS).endMetadata().build()).create();
 
-        // Deploy the different resources: Service, CRD, Deployment, ConfigMap except the Notification and Dex server
+        // Deploy the different resources: Service, CRD, Deployment, ConfigMap except the Argocd Notification and Dex server
         List<HasMetadata> filteredItems = items.stream()
             .filter(r -> !(r instanceof Deployment &&
                 (ARGOCD_POD_DEX_SERVER_NAME.equals(r.getMetadata().getName()) || ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME.equals(r.getMetadata().getName()))))
