@@ -91,11 +91,11 @@ public class ArgoCDDeployTest {
         // Waiting till the pods are ready/running ...
         waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_REDIS_NAME);
         waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_REPO_SERVER_NAME);
-        waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_DEX_SERVER_NAME);
         waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_SERVER_NAME);
-        waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME);
         waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_APPLICATIONSET_CONTROLLER_NAME);
         waitTillPodReady(ARGOCD_NS, ARGOCD_POD_APP_CONTROLLER_NAME);
+        //waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME);
+        //waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_DEX_SERVER_NAME);
 
         // Populate the Argocd resources
         Config config = new Config();
