@@ -156,10 +156,11 @@ jobs:
           
           export DOCKER_HOST=unix://$PODMAN_SOCK_PATH
           export DOCKER_CONFIG=$HOME/.docker
+          
+          export argocd.resource.timeout=180
 
           mvn -B test -Dtest=ArgoCDDeployTest \
-            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }} \
-            -Dargocd.resource.timeout=180
+            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
           # | tee app.log
 
       #- name: Get the log and extract the container id

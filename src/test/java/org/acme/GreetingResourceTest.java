@@ -8,6 +8,14 @@ import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 class GreetingResourceTest {
+    public long timeOut;
+    @Test
+    public void testGreeting() {
+        if (System.getenv("argocd.resource.timeout") != null) {
+            timeOut = Long.parseLong(System.getenv("argocd.resource.timeout"));
+            System.out.println("Timeout: " + timeOut);
+        }
+    }
     @Test
     void testHelloEndpoint() {
         given()
