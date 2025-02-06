@@ -47,7 +47,7 @@ jobs:
       - name: Create linux's vm on macos
         if: matrix.os == 'macos-13'
         run: |
-          podman machine init --cpus 6 -m 6144
+          podman machine init --cpus 4 -m 4096
           podman machine inspect | jq -r '.[].Resources'
           
           # 
