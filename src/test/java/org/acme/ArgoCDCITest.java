@@ -1,6 +1,5 @@
 package org.acme;
 
-import com.dajudge.kindcontainer.KindContainer;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -8,13 +7,11 @@ import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkiverse.argocd.v1alpha1.Application;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.junit.BeforeClass;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,12 +22,8 @@ import static org.acme.ArgocdResourceGenerator.populateApplication;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Testcontainers
-public class ArgoCDDeployTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ArgoCDDeployTest.class);
-
-    @Container
-    public static final KindContainer<?> KUBE = new KindContainer<>();
+public class ArgoCDCITest extends BaseContainer {
+    private static final Logger LOG = LoggerFactory.getLogger(ArgoCDCITest.class);
 
     private static final String ARGOCD_NS = "argocd";
 
@@ -42,12 +35,11 @@ public class ArgoCDDeployTest {
     private static final String ARGOCD_POD_DEX_SERVER_NAME = "argocd-dex-server";
     private static final String ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
 
-    //@ConfigProperty(name = "argocd.resource.timeout", defaultValue = "1")
     public static long timeOut = 1;
 
-    final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()));
+    final static KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KIND.getKubeconfig()));
 
-    private void waitTillPodReady(String ns, String name) {
+    private static void waitTillPodReady(String ns, String name) {
         client.resources(Pod.class)
             .inNamespace(ns)
             .withName(name)
@@ -55,7 +47,7 @@ public class ArgoCDDeployTest {
         LOG.info("Pod: {} ready in {}", name, ns);
     }
 
-    private void waitTillPodByLabelReady(String ns, String key, String value) {
+    private static void waitTillPodByLabelReady(String ns, String key, String value) {
         client.resources(Pod.class)
             .inNamespace(ns)
             .withLabel(key, value)
@@ -63,16 +55,16 @@ public class ArgoCDDeployTest {
         LOG.info("Pod: {} ready in {}", value, ns);
     }
 
-    @Test
-    public void deployArgoCD() {
+    @BeforeAll
+    public static void deployArgocd() {
         if (System.getenv("ARGOCD_RESOURCE_TIMEOUT") != null) {
             timeOut = Long.parseLong(System.getenv("ARGOCD_RESOURCE_TIMEOUT"));
             LOG.info("Kubernetes waiting resource - Timeout: {}", timeOut);
         }
 
-        List<HasMetadata> items = client.load(getClass().getResourceAsStream("/argocd.yml")).items();
+        List<HasMetadata> items = client.load(ArgoCDCITest.class.getResourceAsStream("/argocd.yml")).items();
 
-        // Let's create the argocd namespace to deploy the resources
+        LOG.info("Creating the argocd namespace");
         client.namespaces().resource(new NamespaceBuilder().withNewMetadata().withName(ARGOCD_NS).endMetadata().build()).create();
 
         // Deploy the different resources: Service, CRD, Deployment, ConfigMap except the Argocd Notification and Dex server
@@ -80,8 +72,9 @@ public class ArgoCDDeployTest {
             .filter(r -> !(r instanceof Deployment &&
                 (ARGOCD_POD_DEX_SERVER_NAME.equals(r.getMetadata().getName()) || ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME.equals(r.getMetadata().getName()))))
             .collect(Collectors.toList());
-
         assertEquals(57, filteredItems.size());
+
+        LOG.info("Deploying the argocd resources ...");
         for (HasMetadata item : filteredItems) {
             var res = client.resource(item).inNamespace("argocd");
             res.create();
@@ -96,8 +89,13 @@ public class ArgoCDDeployTest {
         waitTillPodReady(ARGOCD_NS, ARGOCD_POD_APP_CONTROLLER_NAME);
         //waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME);
         //waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_DEX_SERVER_NAME);
+    }
 
-        // Populate the Argocd resources
+    @Test
+    public void testCaseOne() {
+
+        // Populate the Argocd Application resource
+        // Namespace: argocd control's plane - argocd
         Config config = new Config();
         config.setDestinationNamespace("argocd");
         config.setApplicationName("test-1");
