@@ -51,7 +51,7 @@ public class ArgoCDDeployTest {
         client.resources(Pod.class)
             .inNamespace(ns)
             .withName(name)
-            .waitUntilReady(180, TimeUnit.SECONDS);
+            .waitUntilReady(timeOut, TimeUnit.SECONDS);
         LOG.info("Pod: {} ready in {}", name, ns);
     }
 
