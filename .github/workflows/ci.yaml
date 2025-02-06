@@ -47,7 +47,8 @@ jobs:
       - name: Create linux's vm on macos
         if: matrix.os == 'macos-13'
         run: |
-          podman machine init
+          podman machine init --cpus 4 -m 4096
+          podman machine inspect | jq -r '.[].Resources'
           
           # 
           # By default, the podman-mac-helper agent is not started and we could not use the following sock path: /var/run/docker.sock
