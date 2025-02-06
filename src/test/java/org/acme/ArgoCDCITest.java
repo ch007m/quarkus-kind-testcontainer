@@ -106,18 +106,6 @@ public class ArgoCDCITest extends BaseContainer {
             .inNamespace(ARGOCD_NS)
             .create();
 
-        // Sleep 5 seconds
-        // If we don't pause here the program, then we got this error: https://github.com/ch007m/quarkus-kind-testcontainer/issues/1#issuecomment-2630766957
-        // as Jackson cannot process the Application object as it do not include the Operation class and related
-        // Such Operation is added by Argo cd when it performs sync or health operations and
-        // here: status is not yet healthy and synced is out-of-sync
-        /*
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }*/
-
         LOG.info("Checking when Argocd Application will be Healthy");
         try {
             client.resources(Application.class)
