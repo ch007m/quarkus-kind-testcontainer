@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkiverse.argocd.v1alpha1.Application;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,9 @@ public class ArgoCDDeployTest {
     private static final String ARGOCD_POD_DEX_SERVER_NAME = "argocd-dex-server";
     private static final String ARGOCD_POD_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
 
+    @ConfigProperty(name = "argocd.resource.timeout", defaultValue = "1")
+    private long timeOut;
+
     final KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KUBE.getKubeconfig()));
 
     private void waitTillPodReady(String ns, String name) {
@@ -53,7 +57,7 @@ public class ArgoCDDeployTest {
         client.resources(Pod.class)
             .inNamespace(ns)
             .withLabel(key, value)
-            .waitUntilReady(180, TimeUnit.SECONDS);
+            .waitUntilReady(timeOut, TimeUnit.SECONDS);
         LOG.info("Pod: {} ready in {}", value, ns);
     }
 
