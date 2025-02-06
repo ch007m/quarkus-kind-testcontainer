@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.quarkiverse.argocd.v1alpha1.AppProject;
 import io.quarkiverse.argocd.v1alpha1.Application;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
 import static org.acme.ArgocdResourceGenerator.populateApplication;
+import static org.acme.ArgocdResourceGenerator.populateProject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -91,16 +93,13 @@ public class ArgoCDCITest extends BaseContainer {
         //waitTillPodByLabelReady(ARGOCD_NS,"app.kubernetes.io/name",ARGOCD_POD_DEX_SERVER_NAME);
     }
 
+    /*
+      Use the Default Argocd AppProject
+      Populate an Argocd Application and deploy it under: argocd control's plane
+    */
     @Test
     public void testCaseOne() {
 
-        /*
-           Test case
-           Use the Default Argocd AppProject
-           Populate an Argocd Application
-           Deploy the Application using the argocd control's plane
-
-         */
         Config config = new Config();
         config.setDestinationNamespace("argocd");
         config.setApplicationName("test-1");
@@ -147,5 +146,74 @@ public class ArgoCDCITest extends BaseContainer {
             .inNamespace(ARGOCD_NS)
             .withName(config.getApplicationName()).get();
         LOG.warn(client.getKubernetesSerialization().asYaml(app));
+    }
+
+    /*
+      Use a new AppProject deployed under: argocd control's plane
+      Populate an Argocd Application using the new AppProject and
+      deploy it under: argocd control's plane
+    */
+    @Test
+    public void testCaseTwo() {
+
+        Config config = new Config();
+        config.setProjectName("test-2");
+        config.setGitUrl("https://github.com/argoproj/argocd-example-apps.git");
+        config.setDestinationNamespace("argocd");
+
+        config.setApplicationName("test-2");
+        config.setApplicationNamespace("argocd");
+
+        config.setGitRevision("master");
+
+        client.resource(populateProject(config))
+            .inNamespace(ARGOCD_NS)
+            .create();
+
+        client.resource(populateApplication(config))
+            .inNamespace(ARGOCD_NS)
+            .create();
+
+        LOG.info("Checking when Argocd Application will be Healthy");
+        try {
+            client.resources(Application.class)
+                .inNamespace(ARGOCD_NS)
+                .withName(config.getApplicationName())
+                .waitUntilCondition(a ->
+                    a != null &&
+                        a.getStatus() != null &&
+                        a.getStatus().getHealth() != null &&
+                        a.getStatus().getHealth().getStatus() != null &&
+                        a.getStatus().getHealth().getStatus().equals("Healthy"), 3600, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOG.error(client.getKubernetesSerialization().asYaml(client.genericKubernetesResources("argoproj.io/v1alpha1", "Application").inNamespace(ARGOCD_NS).withName(config.getApplicationName()).get()));
+        }
+        LOG.info("Argocd Application: {} healthy", config.getApplicationName());
+
+        LOG.info("Checking now when Argocd Application will be synced");
+        try {
+            client.resources(Application.class)
+                .inNamespace(ARGOCD_NS)
+                .withName(config.getApplicationName())
+                .waitUntilCondition(a ->
+                    a != null &&
+                        a.getStatus() != null &&
+                        a.getStatus().getSync() != null &&
+                        a.getStatus().getSync().getStatus() != null &&
+                        a.getStatus().getSync().getStatus().equals("Synced"), 3600, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOG.error(client.getKubernetesSerialization().asYaml(client.genericKubernetesResources("argoproj.io/v1alpha1", "Application").inNamespace(ARGOCD_NS).withName(config.getApplicationName()).get()));
+        }
+        LOG.info("Argocd Application: {} synced", config.getApplicationName());
+
+        Application app = client.resources(Application.class)
+            .inNamespace(ARGOCD_NS)
+            .withName(config.getApplicationName()).get();
+        LOG.warn(client.getKubernetesSerialization().asYaml(app));
+
+        AppProject appProject = client.resources(AppProject.class)
+            .inNamespace(ARGOCD_NS)
+            .withName(config.getApplicationName()).get();
+        LOG.warn(client.getKubernetesSerialization().asYaml(appProject));
     }
 }
