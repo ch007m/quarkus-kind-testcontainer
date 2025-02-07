@@ -1,9 +1,12 @@
 package org.acme;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.quarkiverse.argocd.v1alpha1.AppProject;
 import io.quarkiverse.argocd.v1alpha1.Application;
 
@@ -39,7 +42,18 @@ public class ArgoCDCITest extends BaseContainer {
 
     public static long timeOut = 1;
 
-    final static KubernetesClient client = new DefaultKubernetesClient(fromKubeconfig(KIND.getKubeconfig()));
+    static KubernetesClient client;
+
+    static {
+        var objectMapper = new ObjectMapper();
+        objectMapper.addMixIn(ObjectMeta.class, ObjectMetaMixin.class);
+
+        var kubernetesSerialization = new KubernetesSerialization(objectMapper, true);
+        client = new KubernetesClientBuilder()
+            .withConfig(fromKubeconfig(KIND.getKubeconfig()))
+            .withKubernetesSerialization(kubernetesSerialization)
+            .build();
+    }
 
     private static void waitTillPodReady(String ns, String name) {
         client.resources(Pod.class)
