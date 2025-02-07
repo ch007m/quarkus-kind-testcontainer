@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static io.fabric8.kubernetes.client.Config.fromKubeconfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class KindClusterNodeTest extends BaseContainer{
+public class KindClusterNodeTest extends BaseContainer {
 
     @Test
     public void verify_node_is_present() {

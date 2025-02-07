@@ -18,6 +18,8 @@ public class Config {
     private String destinationKubeServer = "https://kubernetes.default.svc";
     private String destinationNamespace;
 
+    private String sourceNamespaces;
+
     private String gitUrl;
 
     @Builder.Default

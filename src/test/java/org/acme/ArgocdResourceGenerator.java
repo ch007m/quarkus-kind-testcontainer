@@ -9,7 +9,7 @@ public class ArgocdResourceGenerator {
 
     public static AppProject populateProject(Config config) {
     // @formatter:off
-        AppProject project = new AppProjectBuilder()
+        var projectBuilder = new AppProjectBuilder()
           .withNewMetadata()
             .withName(config.getProjectName())
             .withNamespace(config.getProjectNamespace())
@@ -20,10 +20,14 @@ public class ArgocdResourceGenerator {
               .withServer(config.getDestinationKubeServer())
             .endDestination()
           .withSourceRepos(config.getGitUrl())
-          .endSpec()
-          .build();
+          .endSpec();
+
+        if (config.getSourceNamespaces() != null) {
+            projectBuilder.editOrNewSpec().withSourceNamespaces(config.getSourceNamespaces()).endSpec();
+        }
+
         // @formatter:on
-        return project;
+        return projectBuilder.build();
     }
 
     public static Application populateApplication(Config config) {
