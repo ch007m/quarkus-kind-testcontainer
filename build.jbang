@@ -1,0 +1,14 @@
+DEPS io.quarkus.platform:quarkus-bom:3.18.1@pom
+DEPS io.quarkus:quarkus-arc
+DEPS io.quarkus:quarkus-rest
+DEPS org.projectlombok:lombok:1.18.36
+DEPS io.quarkus:quarkus-kubernetes-client
+DEPS io.quarkiverse.argocd:quarkus-argocd-deployment:0.2.0
+DEPS io.quarkus:quarkus-junit5
+DEPS io.rest-assured:rest-assured
+DEPS org.awaitility:awaitility
+DEPS com.dajudge.kindcontainer:kindcontainer:1738827454679-SNAPSHOT
+DEPS io.fabric8:kubernetes-client
+DEPS org.testcontainers:junit-jupiter
+DEPS junit:junit:4.13.2
+GAV org.acme:code-with-quarkus:1.0.0-SNAPSHOT
