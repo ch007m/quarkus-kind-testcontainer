@@ -95,25 +95,11 @@ jobs:
           echo "Let's pull an image ...."
           podman machine ssh "podman pull kindest/node:v1.31.0 "
 
-      - uses: actions/checkout@v4
-        with:
-          repository: ch007m/fork-kindcontainer.git
-          ref: enable-featuregate
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-
-      - name: Build kindcontainer testcontainer project
-        id: build-kindcontainer
-        run: |
-          export SNAPSHOT_VERSION=$(gradle publishToMavenLocal --console=plain | grep 'Publishing to maven local' | awk -F':' '{print $NF}')
-          echo "SNAPSHOT_VERSION=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
-
-      - run: |
-          echo Snapshot version of kind container: ${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }} 
 
       - uses: actions/checkout@v4
 
@@ -132,5 +118,4 @@ jobs:
           
           export ARGOCD_RESOURCE_TIMEOUT=$ARGOCD_RESOURCE_TIMEOUT
 
-          mvn -B test \
-            -Dtestcontainer.version=${{ steps.build-kindcontainer.outputs.SNAPSHOT_VERSION }}
+          mvn -B test
