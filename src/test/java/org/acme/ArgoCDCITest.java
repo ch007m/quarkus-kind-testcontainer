@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ArgoCDCITest extends BaseContainer {
     private static final Logger LOG = LoggerFactory.getLogger(ArgoCDCITest.class);
 
-    private static final String ARGOCD_NS = "quarkus.argocd.controller-namespace";
+    private static final String ARGOCD_NS = "argocd";
 
     private static final String ARGOCD_APP_CONTROLLER_NAME = "argocd-application-controller";
     private static final String ARGOCD_APPLICATIONSET_CONTROLLER_NAME = "argocd-applicationset-controller";
@@ -40,7 +40,7 @@ public class ArgoCDCITest extends BaseContainer {
     private static final String ARGOCD_NOTIFICATION_CONTROLLER_NAME = "argocd-notifications-controller";
     private static final String ARGOCD_CONFIGMAP_PARAMS_NAME = "argocd-cmd-params-cm";
 
-    public static long timeOut = 1;
+    public static long timeOut = 180;
 
     static KubernetesClient client;
 
@@ -78,7 +78,7 @@ public class ArgoCDCITest extends BaseContainer {
             LOG.info("Kubernetes waiting resource - Timeout: {}", timeOut);
         }
 
-        List<HasMetadata> items = client.load(ArgoCDCITest.class.getResourceAsStream("/argocd-2.13.2.yml")).items();
+        List<HasMetadata> items = client.load(ArgoCDCITest.class.getResourceAsStream("/argocd-2.13.yml")).items();
 
         LOG.info("Creating the argocd namespace");
         client.namespaces().resource(new NamespaceBuilder().withNewMetadata().withName(ARGOCD_NS).endMetadata().build()).create();
